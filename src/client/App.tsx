@@ -1,25 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {createContext} from 'react';
 import './App.css';
+import {MuiThemeProvider, StylesProvider} from "@material-ui/core";
+import {TPrintedMailsApi, usePrintedMails} from "./hooks/printed-mails-hook";
+import {theme} from "./theme";
+import {AppRoutes} from "./routes";
 
-function App() {
+
+export type TAppContext = {
+  printedMails: TPrintedMailsApi
+};
+export const AppContext = createContext<TAppContext | null>(null);
+
+export function App() {
+
+  const appContextValue: TAppContext = {
+    printedMails: usePrintedMails()
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div className="App">
+        <AppContext.Provider value={appContextValue}>
+          <StylesProvider injectFirst>
+            <MuiThemeProvider theme={theme}>
+              <AppRoutes/>
+            </MuiThemeProvider>
+          </StylesProvider>
+        </AppContext.Provider>
+      </div>
   );
 }
 
