@@ -1,23 +1,23 @@
 import fs from "fs";
 import readline from "readline";
-import {google, gmail_v1} from "googleapis";
-import {OAuth2Client, Credentials} from "google-auth-library";
+import { google, gmail_v1 } from "googleapis";
+import { OAuth2Client, Credentials } from "google-auth-library";
 import * as credentials from "../../credentials.json";
 import _ from "lodash";
 import moment from "moment";
 import path from "path";
-import {Printer} from "ipp";
-import {TAttachmentInfo} from "../common"
+import { Printer } from "ipp";
+import { TAttachmentInfo } from "../common"
 
 const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
 const TOKEN_PATH = "token.json";
-const {client_secret, client_id, redirect_uris} = credentials.installed;
+const { client_secret, client_id, redirect_uris } = credentials.installed;
 const dataDir = "./data/";
 const attachmentsFileName = "processed-messages.json";
 
 const getAuthClientFromToken = (token: Credentials) => {
   const oAuth2Client = new OAuth2Client(
-      client_id, client_secret, redirect_uris[0]);
+    client_id, client_secret, redirect_uris[0]);
 
   oAuth2Client.setCredentials(token);
 
@@ -42,7 +42,7 @@ const writeToken = (token: Credentials) => new Promise<Credentials>((resolve, re
 
 const askUserForCode: () => Promise<string> = () => {
   const oAuth2Client = new OAuth2Client(
-      client_id, client_secret, redirect_uris[0]);
+    client_id, client_secret, redirect_uris[0]);
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: "offline",
     scope: SCOPES,
@@ -63,7 +63,7 @@ const askUserForCode: () => Promise<string> = () => {
 
 const getToken = (code: string) => new Promise<Credentials>((resolve, reject) => {
   const oAuth2Client = new OAuth2Client(
-      client_id, client_secret, redirect_uris[0]);
+    client_id, client_secret, redirect_uris[0]);
   oAuth2Client.getToken(code, (err, token) => {
     if (err) return reject("Error retrieving access token" + err);
     if (!token) return reject("Token is empty");
@@ -73,7 +73,7 @@ const getToken = (code: string) => new Promise<Credentials>((resolve, reject) =>
 
 const getGmailApi = async () => {
   const auth = await getSavedOAuthClient();
-  return google.gmail({version: "v1", auth});
+  return google.gmail({ version: "v1", auth });
 };
 
 export const getNewToken: () => Promise<Credentials> = async () => {
@@ -93,14 +93,14 @@ const getSavedOAuthClient: () => Promise<OAuth2Client> = async () => {
 export const getTo = (message: gmail_v1.Schema$Message) => {
   const payload = message.payload;
   const headers = payload && payload.headers;
-  const subjectHeader = _.filter(headers, {name: "To"}).map(o => o.value);
+  const subjectHeader = _.filter(headers, { name: "To" }).map(o => o.value);
   return subjectHeader.join(",");
 };
 
 export const getFrom = (message: gmail_v1.Schema$Message) => {
   const payload = message.payload;
   const headers = payload && payload.headers;
-  const subjectHeader = _.find(headers, {name: "From"});
+  const subjectHeader = _.find(headers, { name: "From" });
   return subjectHeader && subjectHeader.value;
 };
 
@@ -108,14 +108,14 @@ export const getFrom = (message: gmail_v1.Schema$Message) => {
 export const getSubject = (message: gmail_v1.Schema$Message) => {
   const payload = message.payload;
   const headers = payload && payload.headers;
-  const subjectHeader = _.find(headers, {name: "Subject"});
+  const subjectHeader = _.find(headers, { name: "Subject" });
   return subjectHeader && subjectHeader.value;
 };
 
 export const getSentDateMmtUtc = (message: gmail_v1.Schema$Message) => {
   const payload = message.payload;
   const headers = payload && payload.headers;
-  const subjectHeader = _.find(headers, {name: "Date"});
+  const subjectHeader = _.find(headers, { name: "Date" });
   return subjectHeader && subjectHeader.value;
 };
 
@@ -148,11 +148,11 @@ const cfg = {
 export const log = (prefix: string, attachmentInfo: TAttachmentInfo) => {
   if (cfg.debug) {
     console.log(prefix,
-        attachmentInfo.timeStamp,
-        attachmentInfo.pagesRanges,
-        attachmentInfo.reason,
-        attachmentInfo.sentDateMmtUtc,
-        attachmentInfo.from
+      attachmentInfo.timeStamp,
+      attachmentInfo.pagesRanges,
+      attachmentInfo.reason,
+      attachmentInfo.sentDateMmtUtc,
+      attachmentInfo.from
     );
   }
 };

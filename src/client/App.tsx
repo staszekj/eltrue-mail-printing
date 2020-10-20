@@ -1,9 +1,9 @@
-import React, {createContext} from 'react';
+import React, { createContext } from 'react';
 import './App.css';
-import {MuiThemeProvider, StylesProvider} from "@material-ui/core";
-import {TPrintedMailsApi, usePrintedMails} from "./hooks/printed-mails-hook";
-import {theme} from "./theme";
-import {AppRoutes} from "./routes";
+import { MuiThemeProvider, StylesProvider } from "@material-ui/core";
+import { TPrintedMailsApi, usePrintedMails } from "./hooks/printed-mails-hook";
+import { theme } from "./theme";
+import { AppRoutes } from "./routes";
 
 
 export type TAppContext = {
@@ -18,15 +18,15 @@ export function App() {
   };
 
   return (
-      <div className="App">
-        <AppContext.Provider value={appContextValue}>
-          <StylesProvider injectFirst>
-            <MuiThemeProvider theme={theme}>
-              <AppRoutes/>
-            </MuiThemeProvider>
-          </StylesProvider>
-        </AppContext.Provider>
-      </div>
+    <div className="App">
+      <AppContext.Provider value={appContextValue}>
+        <StylesProvider injectFirst>
+          <MuiThemeProvider theme={theme}>
+            <AppRoutes />
+          </MuiThemeProvider>
+        </StylesProvider>
+      </AppContext.Provider>
+    </div>
   );
 }
 
