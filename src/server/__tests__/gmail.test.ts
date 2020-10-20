@@ -1,4 +1,4 @@
-import { getGmailApi } from '../gmail'
+import { getGmailApi, aaa } from '../gmail'
 
 jest.mock('../../common/', () => {
   return {
@@ -7,8 +7,9 @@ jest.mock('../../common/', () => {
 });
 
 describe("Test", () => {
-  it.only('should be', () => {
-    expect(true).toBe(true)
+  it.only('should be', async() => {
+    const api = await getGmailApi();
+    expect(api).toBe(api)
   });
   it('should be 1', () => {
     expect(true).toBe(false)

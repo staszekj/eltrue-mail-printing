@@ -37,6 +37,7 @@
     "start:dev:web": "react-scripts start",
     "start:dev:srv": "ts-node-dev --inspect --project ./tsconfig.srv.json ./src/server/server.ts",
     "test": "react-scripts test",
+    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "eject": "react-scripts eject",
     "clean": "rimraf build"
   },
