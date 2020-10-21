@@ -1,16 +1,24 @@
-import { getGmailApi, aaa } from '../gmail'
+import { getGmailApi } from '../gmail'
 
-jest.mock('../../common/', () => {
-  return {
-    PRINTED_EMAILS_ENDPOINT_PATH: 'OK'
-  }
-});
+
+// jest.mock('../../common/', () => {
+//   return {
+//     PRINTED_EMAILS_ENDPOINT_PATH: 'OK'
+//   }
+// });
 
 describe("Test", () => {
+
   it.only('should be', async() => {
-    const api = await getGmailApi();
-    expect(api).toBe(api)
+    const gmailApi = await getGmailApi();
+
+    const messagesResponse = await gmailApi.users.messages.list({
+      userId: "me",
+    });
+
+    expect(messagesResponse).toBeTruthy()
   });
+
   it('should be 1', () => {
     expect(true).toBe(false)
   });
