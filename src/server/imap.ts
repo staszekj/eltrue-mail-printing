@@ -20,7 +20,7 @@ export const getMessages = async () => {
   const connection = await imaps.connect(config);
   await connection.openBox('INBOX');
   // Fetch emails from the last 24h
-  const delay = 24 * 3600 * 1000;
+  const delay = 100 * 3600 * 1000;
   const yesterday = new Date();
   yesterday.setTime(Date.now() - delay);
   const yesterdayStr = yesterday.toISOString();
@@ -33,7 +33,7 @@ export const getMessages = async () => {
     }
     const parts = imaps.getParts(msg.attributes.struct);
     return _.chain(parts)
-      .filter(part => part.disposition && part.disposition.type.toUpperCase() === 'ATTACHMENT')
+      .filter(part => part.disposition?.type?.toUpperCase() === 'ATTACHMENT')
       .filter(part => {
         console.log('msg', msg);
         console.log('part', part);
