@@ -33,7 +33,7 @@ export const getMessages = async () => {
     }
     const parts = imaps.getParts(msg.attributes.struct);
     return _.chain(parts)
-      .filter(part => part.disposition?.type?.toUpperCase() === 'ATTACHMENT')
+      .filter(part => part.disposition?.type?.toLowerCase() === 'attachment')
       .filter(part => {
         console.log('msg', msg);
         console.log('part', part);
