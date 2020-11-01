@@ -24,7 +24,7 @@ export const getMessages = async () => {
   const yesterday = new Date();
   yesterday.setTime(Date.now() - delay);
   const yesterdayStr = yesterday.toISOString();
-  const searchCriteria = ['UNSEEN', ['SINCE', yesterdayStr]];
+  const searchCriteria = [['SINCE', yesterdayStr]];
   const fetchOptions = { struct: true };
   const messages = await connection.search(searchCriteria, fetchOptions);
   const promises = _.flatMap<Message, Promise<TResult>>(messages, msg => {
@@ -32,10 +32,13 @@ export const getMessages = async () => {
       return [];
     }
     const parts = imaps.getParts(msg.attributes.struct);
+    const headerPart = _.find(parts, part => part.which?.toLowerCase() === 'header');
+
     return _.chain(parts)
       .filter(part => part.disposition?.type?.toLowerCase() === 'attachment')
       .filter(part => {
         console.log('msg', msg);
+        console.log('header', headerPart)
         console.log('part', part);
         return true;
       })
@@ -43,6 +46,7 @@ export const getMessages = async () => {
         return {
           msgAttrs: msg.attributes,
           filename: part.disposition.params.filename,
+          subject: _.first(headerPart.body.subject),
           data: await connection.getPartData(msg, part)
         };
       })
