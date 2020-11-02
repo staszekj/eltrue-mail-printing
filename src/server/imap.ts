@@ -25,14 +25,20 @@ export const getMessages = async () => {
   yesterday.setTime(Date.now() - delay);
   const yesterdayStr = yesterday.toISOString();
   const searchCriteria = [['SINCE', yesterdayStr]];
-  const fetchOptions = { struct: true };
+  const fetchOptions = {
+    struct: true,
+    bodies: ['HEADER', 'TEXT'],
+    markSeen: false
+  };
   const messages = await connection.search(searchCriteria, fetchOptions);
   const promises = _.flatMap<Message, Promise<TResult>>(messages, msg => {
-    if (!_.isArray(msg.attributes.struct)) {
+    const headerPart = _.find(msg.parts, part => part.which?.toLowerCase() === 'header');
+    const struct = msg.attributes.struct;
+    if (!headerPart || !_.isArray(struct)) {
       return [];
     }
-    const parts = imaps.getParts(msg.attributes.struct);
-    const headerPart = _.find(parts, part => part.which?.toLowerCase() === 'header');
+
+    const parts = imaps.getParts(struct);
 
     return _.chain(parts)
       .filter(part => part.disposition?.type?.toLowerCase() === 'attachment')
