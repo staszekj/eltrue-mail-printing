@@ -21,7 +21,7 @@
     "googleapis": "^52.1.0",
     "imap-simple": "^5.0.0",
     "ipp": "^2.0.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "moment": "^2.27.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
