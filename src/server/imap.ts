@@ -1,7 +1,8 @@
 import { ImapSimple, Message } from 'imap-simple'
+import { TAttachmenInfo } from '../common/types'
 import * as imaps from 'imap-simple';
 import _ from 'lodash';
-
+import moment from "moment";
 
 const config = {
   imap: {
@@ -14,9 +15,8 @@ const config = {
   }
 };
 
-type TResult = { filename: string, data: string }
 
-export const getMessages = async () => {
+export const getAttachmentsToProcess = async () => {
   const connection = await imaps.connect(config);
   await connection.openBox('INBOX');
   // Fetch emails from the last 24h
@@ -27,11 +27,11 @@ export const getMessages = async () => {
   const searchCriteria = [['SINCE', yesterdayStr]];
   const fetchOptions = {
     struct: true,
-    bodies: ['HEADER', 'TEXT'],
+    bodies: ['HEADER'],
     markSeen: false
   };
   const messages = await connection.search(searchCriteria, fetchOptions);
-  const promises = _.flatMap<Message, Promise<TResult>>(messages, msg => {
+  const promises = _.flatMap<Message, Promise<TAttachmenInfo>>(messages, msg => {
     const headerPart = _.find(msg.parts, part => part.which?.toLowerCase() === 'header');
     const struct = msg.attributes.struct;
     if (!headerPart || !_.isArray(struct)) {
@@ -42,18 +42,22 @@ export const getMessages = async () => {
 
     return _.chain(parts)
       .filter(part => part.disposition?.type?.toLowerCase() === 'attachment')
-      .filter(part => {
-        console.log('msg', msg);
-        console.log('header', headerPart)
-        console.log('part', part);
-        return true;
-      })
       .map(async part => {
+        const timeStamp = moment().format();
+        const subject: TAttachmenInfo['subject'] = _.first(headerPart.body.subject);
+        const messageId: TAttachmenInfo['messageId'] = _.first(headerPart.body['message-id']) ?? timeStamp;
+        const sentDateMmtUtc: TAttachmenInfo['sentDateMmtUtc'] = moment(_.first(headerPart.body.date)).format()
+        const from: TAttachmenInfo['from'] = _.first(headerPart.body.from)
+        const pdfBase64 = await connection.getPartData(msg, part);
+        const fileName = part.disposition.params.filename;
         return {
-          msgAttrs: msg.attributes,
-          filename: part.disposition.params.filename,
-          subject: _.first(headerPart.body.subject),
-          data: await connection.getPartData(msg, part)
+          timeStamp,
+          messageId,
+          sentDateMmtUtc,
+          from,
+          subject,
+          fileName,
+          pdfBase64
         };
       })
       .value();

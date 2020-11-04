@@ -7,9 +7,9 @@ import { getMessages } from '../imap'
 //   }
 // });
 
-describe("Test", () => {
+xdescribe("Test", () => {
 
-  it.only('should be', async () => {
+  it('should be', async () => {
     const messsages = await getMessages();
     console.log('Messages', messsages)
 
