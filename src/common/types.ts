@@ -1,6 +1,19 @@
 import { ImapSimple } from 'imap-simple'
 
-export type TPrintStatus = 'PRINTING'
+export type TPrintStatus = 'TO_PRINT' | 'PRINTED' | 'PRINT_ERROR'
+
+export type TPrintData = {
+  messageId: string,
+  status: TPrintStatus,
+  pagesRanges?: string,
+  pdfBase64: Buffer
+}
+
+export type TPrintResult = {
+  messageId: string,
+  status: TPrintStatus,
+  printResult?: string
+}
 
 export type TAttachmenInfo = {
   messageId: string,

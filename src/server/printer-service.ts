@@ -1,4 +1,4 @@
-import { TPrintPreProcessor } from '../common/types'
+import { TPrintPreProcessor, TAttachmenInfo, TPrintData, TPrintResult } from '../common/types'
 import { Printer } from "ipp";
 import _ from 'lodash';
 
@@ -14,23 +14,34 @@ const printFile = (dataBase64: Buffer, pagesRanges: string) => new Promise((reso
   console.log('msg', msg);
   printer.execute("Print-Job", msg, (err: any, res: any) => {
     if (err) {
-        console.log('err', err);
+      console.log('err', err);
       return reject(err);
     }
     resolve(res);
   });
 });
 
-export const print = async (printerPreProcessor: TPrintPreProcessor) => {
-  await Promise.all(_.map(printerPreProcessor.processed, async (val) => {
+export async function* print<T extends TPrintData>(printData: Array<T>): AsyncGenerator<T & TPrintData & TPrintResult>{
+  for (const data of printData) {
     try {
-      await printFile(val.pdfBase64, val.pagesRanges);
-      console.log('OK !!!')
-      return val;
+      if (data.status !== 'TO_PRINT' || !data.pagesRanges) {
+        yield data
+        continue;
+      }
+      const result = await printFile(data.pdfBase64, data.pagesRanges)
+      yield {
+        ...data,
+        status: 'PRINTED',
+        printResult: result
+      }
+      return;
     } catch (e) {
-      console.log("ERROR-PRINTED: " + e);
-      return val;
+      yield {
+        ...data,
+        status: 'PRINT_ERROR',
+        printResult: e.toString()
+      }
     }
-  }));
+  }
   console.log('Done.')
 }
