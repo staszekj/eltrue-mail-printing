@@ -1,47 +1,33 @@
-import { TPrintPreProcessor, TAttachmenInfo, TPrintData, TPrintResult } from '../common/types'
-import { Printer } from "ipp";
+import { TPrintData, TPrintResult, TPrintResultCb } from '../common/types'
+import { printFile } from './print-service'
 import _ from 'lodash';
 
-const printFile = (dataBase64: Buffer, pagesRanges: string) => new Promise((resolve, reject) => {
-  const printer = new Printer("http://localhost:631/printers/Brother_DCP_7030_X");
-  const msg = {
-    "operation-attributes-tag": {
-      "document-format": "application/pdf"
-    },
-    "page-ranges": pagesRanges,
-    "data": dataBase64
-  };
-  console.log('msg', msg);
-  printer.execute("Print-Job", msg, (err: any, res: any) => {
-    if (err) {
-      console.log('err', err);
-      return reject(err);
-    }
-    resolve(res);
-  });
-});
 
-export async function* print<T extends TPrintData>(printData: Array<T>): AsyncGenerator<T & TPrintData & TPrintResult>{
-  for (const data of printData) {
+export async function print<T extends TPrintData>(printData: Array<T>, callback: TPrintResultCb): Promise<Array<T & TPrintResult>> {
+  const results = _.map(printData, async (dataToPrint) => {
     try {
-      if (data.status !== 'TO_PRINT' || !data.pagesRanges) {
-        yield data
-        continue;
+      if (dataToPrint.status !== 'TO_PRINT' || !dataToPrint.pagesRanges) {
+        callback(dataToPrint);
+        return dataToPrint;
       }
-      const result = await printFile(data.pdfBase64, data.pagesRanges)
-      yield {
-        ...data,
+      const printResult = await printFile(dataToPrint.pdfBase64, dataToPrint.pagesRanges)
+      const dataToPrintSucc = {
+        ...dataToPrint,
         status: 'PRINTED',
-        printResult: result
-      }
-      return;
+        printResult: printResult
+      };
+      callback(dataToPrintSucc)
+      return dataToPrintSucc;
     } catch (e) {
-      yield {
-        ...data,
+      const dataToPrintErr = {
+        ...dataToPrint,
         status: 'PRINT_ERROR',
         printResult: e.toString()
-      }
+      };
+      callback(dataToPrintErr)
+      return dataToPrintErr
     }
-  }
-  console.log('Done.')
+  })
+  const printedData = await Promise.all(results);
+  return printedData;
 }
