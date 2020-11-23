@@ -1,7 +1,8 @@
 import fs from "fs";
-import { TAttachmenInfo, TMain, THistory, TAttachmentInfoMap } from '../common/types'
+import { TAttachmentInfo, TMain, THistory, TAttachmentInfoMap } from '../common/types'
 import path from "path";
 import _ from "lodash"
+import { write } from './hist-service';
 
 export const getJsonDir = (main: TMain) => path.join(main.dataDir, main.attachmentsFileName)
 export const getPrevAttachmentInfo = (processedAttachments: TAttachmentInfoMap, messageId: string) => processedAttachments?.[messageId]
@@ -16,17 +17,12 @@ export const readProcessedMessages = (main: TMain, history: THistory) => new Pro
   }
   fs.readFile(pathToFile, (err, res) => {
     if (err) return reject(err);
-    const jsonData: TAttachmenInfo[] = JSON.parse(res.toString());
+    const jsonData: TAttachmentInfo[] = JSON.parse(res.toString());
     resolve(_.keyBy(jsonData, 'messageId'));
   });
 });
 
-export const writeProcessedMessages = (main: TMain, processedAttachments: TAttachmenInfo[]) => new Promise<THistory["storedAttachmentsInfo"]>((resolve, reject) => {
+export const writeProcessedMessages = async (main: TMain, processedAttachments: TAttachmentInfo[]) => {
   const pathToFile = getJsonDir(main)
-  const processedAttachmentsMap = _.keyBy(processedAttachments, 'messageId')
-  fs.writeFile(pathToFile, JSON.stringify(_.values(processedAttachments)), (err) => {
-    if (err) return reject(err);
-    resolve(processedAttachmentsMap);
-  });
-
-});
+  await write(pathToFile, JSON.stringify(_.values(processedAttachments)))
+};

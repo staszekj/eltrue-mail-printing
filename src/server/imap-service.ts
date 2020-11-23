@@ -3,10 +3,8 @@ import { TAttachmenInfo, TPrintRules, THistory } from '../common/types'
 import * as imaps from 'imap-simple';
 import _ from 'lodash';
 import moment from "moment";
-import { TImap, TAttachmentInfoMap } from '../common/types'
+import { TAttachmentInfoMap } from '../common/types'
 
-
-export const getConnection = (imap: TImap) => imap.connection ?? imaps.connect(imap.imapConfig)
 
 export const process = async (connection: ImapSimple, printRules: TPrintRules, historyProcesseMessages: TAttachmentInfoMap) => {
   await connection.openBox('INBOX');

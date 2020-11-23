@@ -1,35 +1,23 @@
 import { ImapSimple } from 'imap-simple'
 
-export type TPrintStatus = 'TO_PRINT' | 'DOWNLOADING' |'PRINTED' | 'PRINT_ERROR'
+export type TPrintStatus = 'DOWNLOADING' | 'TO_PRINT' | 'PRINTED' | 'PRINT_ERROR'
 
-export type TPrintData = {
-  messageId: string,
-  status: TPrintStatus,
-  pagesRanges?: string,
-  pdfBase64: Buffer
-}
-
-export type TPrintResult = {
-  messageId: string,
-  status: TPrintStatus,
-  printResult?: string
-}
-
-export type TPrintResultCb = (result: TPrintResult) => void;
-
-export type TAttachmenInfo = {
+export type TAttachmentInfo = {
   messageId: string,
   timeStamp?: string;
-  pagesRanges: string;
-  reason?: string | null;
   status?: TPrintStatus;
   sentDateMmtUtc?: string;
   from?: string;
   to?: string;
   subject?: string,
   fileName?: string,
-  pdfBase64: Buffer
+  pagesRanges?: string,
+  pdfBase64?: Buffer,
+  printResult?: string,
+  printDateMntUtc?: string
 }
+
+export type TPrintResultCb = (result: TAttachmentInfo) => void;
 
 export type TPrintRulesResult = {
   pagesRanges?: string,
@@ -37,18 +25,25 @@ export type TPrintRulesResult = {
 }
 
 export type TPrintRules = {
-  getPagesRanges: (info: TAttachmenInfo) => TPrintRulesResult;
+  getPagesRanges: (info: TAttachmentInfo) => TPrintRulesResult;
 }
 
+export type TImapCfg = {
+  user: string,
+  password: string,
+  host: string,
+  port: number,
+  tls: boolean,
+  authTimeout: number,
+}
+
+export type TImapMap = {
+  [key: string]: TImapCfg
+}
+
+
 export type TImapConfig = {
-  imap: {
-    user: string,
-    password: string,
-    host: string,
-    port: number,
-    tls: boolean,
-    authTimeout: number
-  }
+  imap: TImapMap
 }
 
 export type TMain = {
@@ -57,12 +52,8 @@ export type TMain = {
   rulesFileName: string
 }
 
-export type TImap = {
-  imapConfig: TImapConfig,
-  connection?: ImapSimple,
-}
 
-export type TAttachmentInfoMap = { [key: string]: TAttachmenInfo };
+export type TAttachmentInfoMap = { [key: string]: TAttachmentInfo };
 
 export type THistory = {
   storedAttachmentsInfo?: TAttachmentInfoMap
@@ -74,8 +65,7 @@ export type TPrintPreProcessor = {
 
 export type TData = {
   main: TMain,
-  imap: TImap,
+  imapConfig: TImapConfig,
   printRules?: TPrintRules,
-  printPreProcessor: TPrintPreProcessor,
   history: THistory
 };
