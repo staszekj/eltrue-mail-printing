@@ -1,5 +1,5 @@
 import { ImapSimple, Message, connect } from 'imap-simple'
-import { TAttachmentInfo, TAttachmentInfoMap, TImapCfg, TPrintRules } from '../common/types'
+import { TAttachmentInfo, TAttachmentInfoMap, TImapCfg, TImapMap, TPrintRules } from '../common/types'
 import * as imaps from 'imap-simple';
 import _ from 'lodash';
 import moment from "moment";
@@ -12,8 +12,8 @@ export const getConnection = (imap: TImapCfg) => new Promise<ImapSimple>((succes
   });
 });
 
-export const process = async (historyProcesseMessages: TAttachmentInfoMap, printRules: TPrintRules, imap: Array<TImapCfg>) => {
-  const connection  = await getConnection(imap[0]);
+export const process = async (historyProcesseMessages: TAttachmentInfoMap, printRules: TPrintRules, imap: TImapMap) => {
+  const connection  = await getConnection(_.values(imap)[0]);
   await connection.openBox('INBOX');
   // Fetch emails from the last 24h
   const delay = 100 * 3600 * 1000;
