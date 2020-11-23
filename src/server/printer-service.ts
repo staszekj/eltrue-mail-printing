@@ -4,11 +4,11 @@ import { writeProcessedMessages } from './history-service'
 import _ from 'lodash';
 
 
-export async function print(main: TMain, printData: Array<TAttachmentInfo>, callback: TPrintResultCb): Promise<Array<TAttachmentInfo>> {
+export async function print(main: TMain, printData: Array<TAttachmentInfo>, callback?: TPrintResultCb): Promise<Array<TAttachmentInfo>> {
   const results = _.map(printData, async (dataToPrint) => {
     try {
       if (dataToPrint.status !== 'TO_PRINT' || !dataToPrint.pagesRanges || !dataToPrint.pdfBase64) {
-        callback(dataToPrint);
+        callback?.(dataToPrint);
         return dataToPrint;
       }
       const printResult = await printFile(dataToPrint.pdfBase64, dataToPrint.pagesRanges)
@@ -17,7 +17,7 @@ export async function print(main: TMain, printData: Array<TAttachmentInfo>, call
         status: 'PRINTED',
         printResult: printResult
       };
-      callback(dataToPrintSucc)
+      callback?.(dataToPrintSucc)
       return dataToPrintSucc;
     } catch (e) {
       const dataToPrintErr: TAttachmentInfo = {
@@ -25,7 +25,7 @@ export async function print(main: TMain, printData: Array<TAttachmentInfo>, call
         status: 'PRINT_ERROR',
         printResult: e
       };
-      callback(dataToPrintErr)
+      callback?.(dataToPrintErr)
       return dataToPrintErr
     }
   })

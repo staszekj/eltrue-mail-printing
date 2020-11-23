@@ -7,11 +7,8 @@ import { write } from './hist-service';
 export const getJsonDir = (main: TMain) => path.join(main.dataDir, main.attachmentsFileName)
 export const getPrevAttachmentInfo = (processedAttachments: TAttachmentInfoMap, messageId: string) => processedAttachments?.[messageId]
 
-export const readProcessedMessages = (main: TMain, history: THistory) => new Promise<TAttachmentInfoMap>((resolve, reject) => {
+export const readProcessedMessages = (main: TMain) => new Promise<TAttachmentInfoMap>((resolve, reject) => {
   const pathToFile = getJsonDir(main)
-  if (history.storedAttachmentsInfo) {
-    return resolve(history.storedAttachmentsInfo);
-  }
   if (!fs.existsSync(pathToFile)) {
     return resolve({});
   }

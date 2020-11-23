@@ -4,9 +4,6 @@ import _ from "lodash"
 
 export const getRulesFileName = (main: TMain) => path.join(process.cwd(), main.dataDir, main.rulesFileName)
 
-export const getPrintRules = (main: TMain, printRules?: TPrintRules) => {
-  if (printRules) {
-    return printRules
-  }
+export const getPrintRules = (main: TMain) => {
   return require(getRulesFileName(main)) as TPrintRules
 }

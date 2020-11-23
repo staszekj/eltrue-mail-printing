@@ -23,25 +23,21 @@ export const data: TData = {
       },
     },
   },
-  printRules: undefined,
-  history: {
-    storedAttachmentsInfo: undefined
-  }
 };
 
 export const getMain = () => data.main;
-export const getHistory = () => data.history;
 
 export const getHistoryProcessedMessages = async () => {
-  data.history.storedAttachmentsInfo = await history.readProcessedMessages(getMain(), getHistory())
-  return data.history.storedAttachmentsInfo
+  return await history.readProcessedMessages(getMain())
 }
 
 export const getPrintRules = () => {
-  data.printRules = rules.getPrintRules(getMain(), data.printRules)
-  return data.printRules;
+  return rules.getPrintRules(getMain())
 }
 
-export const print = async (printData: Array<TAttachmentInfo>, callback: TPrintResultCb): Promise<Array<TAttachmentInfo>> => {
+//todo
+//call imap.process here. Compare with print
+
+export const print = async (printData: Array<TAttachmentInfo>, callback?: TPrintResultCb): Promise<Array<TAttachmentInfo>> => {
     return printerService.print(data.main, printData, callback);
 }

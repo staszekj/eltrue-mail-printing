@@ -66,6 +66,4 @@ export type TPrintPreProcessor = {
 export type TData = {
   main: TMain,
   imapConfig: TImapConfig,
-  printRules?: TPrintRules,
-  history: THistory
 };

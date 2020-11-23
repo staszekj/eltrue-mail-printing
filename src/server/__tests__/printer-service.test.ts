@@ -18,8 +18,8 @@ jest.mock('../print-service', () => {
 jest.mock('../hist-service', () => {
   return {
     write: async (pathToFile: string, text: string) => {
-      console.log("path", pathToFile)
-      console.log("text", text)
+      // console.log("path", pathToFile)
+      // console.log("text", text)
     }
   }
 });
@@ -46,7 +46,7 @@ describe.only("printer-service", () => {
   }]
 
   it.only("should work", async () => {
-    const results = await print(printData, (data) => console.log('CB: ', data));
-    console.log(results);
+    const results = await print(printData);
+    // console.log(results);
   })
 })
