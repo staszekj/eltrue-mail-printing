@@ -16,10 +16,9 @@ app.use('/', express.static("build"));
 
 
 app.get<ParamsDictionary, TPrintedMailsResponse>(PRINTED_EMAILS_ENDPOINT_PATH, async (req, res) => {
-  const results = await mainComponent.readProcessedMessages();
+  const results = await mainComponent.process();
   res.send(results)
 });
 
-mainComponent.process();
 console.log(`Server is started on port ${PORT}`);
 app.listen(PORT);
