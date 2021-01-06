@@ -15,7 +15,10 @@ export type TAttachmentInfo = {
   pdfBase64?: Buffer,
   printResult?: string,
   printDateMntUtc?: string
+  reason?: string
 }
+
+export type TPrintedMailsResponse = Array<TAttachmentInfo>;
 
 export type TPrintResultCb = (result: TAttachmentInfo) => void;
 

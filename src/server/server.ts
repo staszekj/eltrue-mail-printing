@@ -5,8 +5,8 @@ import {
 } from "../common";
 
 import { ParamsDictionary } from "express-serve-static-core";
-import { processMessages, readProcessedMessages } from "./process-messages";
-import { TPrintedMailsResponse } from "../common";
+import * as mainComponent from "./main";
+import { TPrintedMailsResponse } from "../common/types";
 
 export const PORT = process.env.PORT || 8001;
 export const app = express();
@@ -16,10 +16,10 @@ app.use('/', express.static("build"));
 
 
 app.get<ParamsDictionary, TPrintedMailsResponse>(PRINTED_EMAILS_ENDPOINT_PATH, async (req, res) => {
-  const results = await readProcessedMessages();
+  const results = await mainComponent.readProcessedMessages();
   res.send(results)
 });
 
-processMessages();
+mainComponent.process();
 console.log(`Server is started on port ${PORT}`);
 app.listen(PORT);

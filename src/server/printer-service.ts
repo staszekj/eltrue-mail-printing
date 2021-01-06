@@ -1,10 +1,9 @@
 import { TAttachmentInfo, TPrintResultCb, TMain } from '../common/types'
 import { printFile } from './print-service'
-import { writeProcessedMessages } from './history-service'
 import _ from 'lodash';
 
 
-export async function print(main: TMain, printData: Array<TAttachmentInfo>, callback?: TPrintResultCb): Promise<Array<TAttachmentInfo>> {
+export async function print(printData: Array<TAttachmentInfo>, callback?: TPrintResultCb): Promise<Array<TAttachmentInfo>> {
   const results = _.map(printData, async (dataToPrint) => {
     try {
       if (dataToPrint.status !== 'TO_PRINT' || !dataToPrint.pagesRanges || !dataToPrint.pdfBase64) {
@@ -29,7 +28,5 @@ export async function print(main: TMain, printData: Array<TAttachmentInfo>, call
       return dataToPrintErr
     }
   })
-  const printedData = await Promise.all(results);
-  writeProcessedMessages(main, printData);
-  return printedData;
+  return await Promise.all(results);
 }
